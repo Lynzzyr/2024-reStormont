@@ -4,14 +4,41 @@
 
 package frc.robot;
 
-import frc.robot.Constants.kControllers;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.kControllers;
+import frc.robot.Constants.kDrive;
+import frc.robot.generated.TunerConstantsComp;
+import frc.robot.subsystems.Drivetrain;
 
 public class RobotContainer {
-    private final CommandXboxController m_controllerPrimary = new CommandXboxController(kControllers.PRIMARY_CONTROLLER);
+
+    // Controllers
+    private final CommandXboxController m_primaryController;
+
+    // Subsystems
+    private final Drivetrain sys_drivetrain;
+
+    // Commands
+    private final Command cmd_drive;
 
     public RobotContainer() {
+
+        // Controllers
+        m_primaryController = new CommandXboxController(kControllers.PRIMARY_CONTROLLER);
+
+        // Subsystems
+        sys_drivetrain = TunerConstantsComp.DriveTrain;
+
+        // Commands
+        cmd_drive = sys_drivetrain.drive(
+            () -> -m_primaryController.getLeftY() * kDrive.MAX_DRIVE_VELOCIY,
+            () -> -m_primaryController.getLeftX() * kDrive.MAX_DRIVE_VELOCIY,
+            () -> (m_primaryController.getLeftTriggerAxis() - m_primaryController.getRightTriggerAxis()) * kDrive.MAX_TURN_ANGULAR_VELOCITY
+        );
+
+        sys_drivetrain.setDefaultCommand(cmd_drive);
+
         configureBindings();
     }
 
