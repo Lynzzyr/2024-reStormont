@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule;
@@ -20,6 +21,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -40,6 +42,9 @@ public class Drivetrain extends SwerveDrivetrain implements Subsystem {
     // Odometry
     private final SwerveDrivePoseEstimator m_poseEstimator;
 
+    // Orchestra :)
+    private final Orchestra m_orchestra;
+
     public Drivetrain(SwerveDrivetrainConstants driveTrainConstants, SwerveModuleConstants... modules) {
         super(driveTrainConstants, modules);
 
@@ -52,6 +57,12 @@ public class Drivetrain extends SwerveDrivetrain implements Subsystem {
         
         // Odometry
         m_poseEstimator = this.m_odometry;
+
+        // Orchestra :)
+        m_orchestra = new Orchestra(Filesystem.getDeployDirectory() + "mcdonald.chrp");
+        for (SwerveModule module : this.Modules) {
+            m_orchestra.addInstrument(module.getDriveMotor());
+        }
         
         // Swerve setup
         for (SwerveModule module : this.Modules) {
@@ -156,6 +167,28 @@ public class Drivetrain extends SwerveDrivetrain implements Subsystem {
      */
     public void updatePoseEstimator() {
         m_poseEstimator.update(m_pigeon2.getRotation2d(), m_modulePositions);
+    }
+
+    /**
+     * Play McDonald's jingle!
+     */
+    public void playJingle() {
+        m_orchestra.play();
+    }
+
+    /**
+     * Stop McDonald's jingle!
+     */
+    public void stopJingle() {
+        m_orchestra.stop();
+    }
+
+    /**
+     * Get the state of the Orchestra
+     * @return True if the orchestra is jingling
+     */
+    public boolean getOrchestraState() {
+        return m_orchestra.isPlaying();
     }
 
     @Override
